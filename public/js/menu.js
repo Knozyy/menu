@@ -76,16 +76,45 @@
     if (searchWrap) searchWrap.classList.remove('open');
   }
 
+  // ---------- kategori alt-paneli ----------
+  var sheet = document.getElementById('catSheet');
+  var backdrop = document.getElementById('sheetBackdrop');
+  function openSheet() {
+    if (!sheet) return;
+    sheet.classList.add('open');
+    if (backdrop) backdrop.classList.add('open');
+  }
+  function closeSheet() {
+    if (sheet) sheet.classList.remove('open');
+    if (backdrop) backdrop.classList.remove('open');
+  }
+  if (backdrop) backdrop.addEventListener('click', closeSheet);
+  var sheetClose = document.getElementById('sheetClose');
+  if (sheetClose) sheetClose.addEventListener('click', closeSheet);
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeSheet();
+  });
+  // panel içindeki bir kategoriye dokununca: kapat + o bölüme kaydır
+  document.querySelectorAll('.sheet-item[data-target]').forEach(function (item) {
+    item.addEventListener('click', function () {
+      var el = document.getElementById(item.getAttribute('data-target'));
+      closeSheet();
+      if (el) setTimeout(function () { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 120);
+    });
+  });
+
   document.querySelectorAll('.tab[data-act]').forEach(function (btn) {
     btn.addEventListener('click', function () {
       var act = btn.getAttribute('data-act');
       if (act === 'top') {
         closeSearch();
+        closeSheet();
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } else if (act === 'cats') {
         closeSearch();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        openSheet();
       } else if (act === 'search') {
+        closeSheet();
         if (searchWrap && searchWrap.classList.contains('open')) closeSearch();
         else openSearch();
       }
