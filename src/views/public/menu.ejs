@@ -1,0 +1,76 @@
+<%- include('../partials/head', { title: brand }) %>
+<%
+  // NOT: Bu, menü tasarımı (menu-preview.html) gelene kadar geçici ama çalışır
+  // bir müşteri menüsüdür. Aynı tasarım sistemini (CSS değişkenleri, fontlar)
+  // kullanır. Tasarım paylaşıldığında bu şablon onunla değiştirilecek.
+  function thumb(p){
+    return p.image_url
+      ? 'background-image:url(' + encodeURI(p.image_url) + ')'
+      : 'background-image:repeating-linear-gradient(45deg,var(--surface-2),var(--surface-2) 9px,var(--surface-3) 9px,var(--surface-3) 18px)';
+  }
+%>
+
+<div style="max-width:680px;margin:0 auto;min-height:100vh;background:var(--bg)">
+
+  <!-- Sticky başlık + kategori sekmeleri -->
+  <header style="position:sticky;top:0;z-index:20;background:var(--surface);border-bottom:1px solid var(--border);backdrop-filter:saturate(1.4)">
+    <div style="display:flex;align-items:center;gap:11px;padding:16px 18px 12px">
+      <div style="width:40px;height:40px;border-radius:12px;background:var(--accent);color:var(--on-accent);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;box-shadow:var(--shadow)">ÇV</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:18px;font-weight:800;letter-spacing:-.3px"><%= brand %></div>
+        <div style="font-size:12px;color:var(--muted)"><%= lang === 'tr' ? 'Dijital Menü' : 'Digital Menu' %></div>
+      </div>
+      <form method="POST" action="/prefs/theme"><input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <button type="submit" title="Theme" class="hov-surface" style="width:36px;height:36px;border:1px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center">
+          <% if (theme === 'dark') { %>
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4.5" stroke="currentColor" stroke-width="2"/><path d="M12 2v2M12 20v2M4 12H2M22 12h-2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <% } else { %>
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+          <% } %>
+        </button>
+      </form>
+    </div>
+    <% if (categories.length) { %>
+      <nav id="catNav" style="display:flex;gap:8px;overflow-x:auto;padding:0 18px 12px;scrollbar-width:none">
+        <% categories.forEach(function(c, i){ %>
+          <a href="#cat-<%= c.id %>" class="cat-chip<%= i === 0 ? ' active' : '' %>" data-target="cat-<%= c.id %>" style="flex:none;height:34px;display:flex;align-items:center;padding:0 14px;border-radius:20px;border:1px solid var(--border);background:var(--surface-2);color:var(--muted);font-size:13.5px;font-weight:700;white-space:nowrap"><%= c.name %></a>
+        <% }); %>
+      </nav>
+    <% } %>
+  </header>
+
+  <main style="padding:8px 14px 48px">
+    <% if (!categories.length) { %>
+      <div style="text-align:center;color:var(--muted);padding:80px 20px">
+        <div style="font-size:16px;font-weight:600;color:var(--text)"><%= lang === 'tr' ? 'Menü hazırlanıyor' : 'Menu coming soon' %></div>
+      </div>
+    <% } %>
+
+    <% categories.forEach(function(c){ %>
+      <section id="cat-<%= c.id %>" style="scroll-margin-top:120px;padding-top:18px">
+        <h2 style="margin:0 0 12px;font-size:19px;font-weight:800;letter-spacing:-.3px;padding-left:4px"><%= c.name %></h2>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <% c.items.forEach(function(p){ %>
+            <article style="display:flex;gap:14px;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:12px;box-shadow:var(--shadow-sm)">
+              <div style="width:88px;height:88px;flex:none;border-radius:12px;background-size:cover;background-position:center;<%- thumb(p) %>"></div>
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+                <div style="font-size:16px;font-weight:700;letter-spacing:-.2px"><%= p.name %></div>
+                <% if (p.description) { %><div style="font-size:13px;color:var(--muted);margin-top:3px;line-height:1.45"><%= p.description %></div><% } %>
+                <div style="flex:1"></div>
+                <div class="mono" style="font-size:16px;font-weight:800;color:var(--accent);margin-top:8px"><%= fmt(p.price) %></div>
+              </div>
+            </article>
+          <% }); %>
+        </div>
+      </section>
+    <% }); %>
+  </main>
+
+  <footer style="text-align:center;padding:24px 16px 40px;color:var(--muted-2);font-size:12px">
+    <%= brand %> · <span class="mono"><%= lang === 'tr' ? 'yalnızca görüntüleme' : 'view only' %></span>
+  </footer>
+</div>
+
+<script src="/js/menu.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<%- include('../partials/head', { title: pageTitle }) %>
+<%- include('../partials/admin-top') %>
+
+<%
+  function thumb(p){
+    return p.image_url
+      ? 'background-image:url(' + encodeURI(p.image_url) + ')'
+      : 'background-image:repeating-linear-gradient(45deg,var(--surface-2),var(--surface-2) 7px,var(--surface-3) 7px,var(--surface-3) 14px)';
+  }
+  function avail(p){
+    return p.is_available ? 'background:var(--ok-soft);color:var(--ok)' : 'background:var(--danger-soft);color:var(--danger)';
+  }
+%>
+
+<div class="animate-pop">
+  <!-- Araç çubuğu: arama + kategori filtresi + ekle (GET form) -->
+  <form id="filterForm" method="GET" action="/admin/products" style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:14px">
+    <div style="position:relative;flex:1;min-width:180px">
+      <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted-2);display:flex"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+      <input name="q" value="<%= q %>" placeholder="<%= t.search_ph %>" style="width:100%;height:42px;padding:0 14px 0 38px;border:1px solid var(--border-strong);border-radius:10px;background:var(--surface);color:var(--text);font-size:14px;font-family:inherit">
+    </div>
+    <select name="cat" id="filterCat" style="height:42px;padding:0 12px;border:1px solid var(--border-strong);border-radius:10px;background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;cursor:pointer">
+      <option value="all"<%= filterCat === 'all' ? ' selected' : '' %>><%= t.all_categories %></option>
+      <% categories.forEach(function(c){ %><option value="<%= c.id %>"<%= String(filterCat) === String(c.id) ? ' selected' : '' %>><%= c.name %></option><% }); %>
+    </select>
+    <a href="/admin/products/new" class="hov-accent" style="height:42px;padding:0 16px;border-radius:10px;background:var(--accent);color:var(--on-accent);font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px;flex:none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg><%= t.add_product %></a>
+  </form>
+
+  <% if (!items.length) { %>
+    <div style="background:var(--surface);border:1px dashed var(--border-strong);border-radius:15px;padding:48px 20px;text-align:center;color:var(--muted)">
+      <div style="font-size:15px;font-weight:600;color:var(--text)"><%= t.no_products %></div>
+      <div style="font-size:13px;margin-top:4px"><%= t.no_products_sub %></div>
+    </div>
+  <% } else { %>
+
+  <!-- Toplu işlem formu (tablo + kartlar bunun içinde) -->
+  <form id="bulkForm" method="POST" action="/admin/products/bulk">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <input type="hidden" name="action" id="bulkActionField" value="">
+
+    <!-- Toplu işlem çubuğu (JS ile gösterilir) -->
+    <div id="bulkBar" class="animate-slide" style="display:none;flex-wrap:wrap;gap:10px;align-items:center;background:var(--accent-soft);border:1px solid var(--accent);border-radius:11px;padding:10px 14px;margin-bottom:12px">
+      <span style="font-size:13.5px;font-weight:700;color:var(--accent)"><span id="bulkCount">0</span><%= t.selected_suffix %></span>
+      <div style="flex:1"></div>
+      <select id="bulkMove" name="move_to" style="height:36px;padding:0 11px;border:1px solid var(--accent);border-radius:9px;background:var(--surface);color:var(--text);font-size:13px;font-family:inherit;cursor:pointer">
+        <option value=""><%= t.move_to %></option>
+        <% categories.forEach(function(c){ %><option value="<%= c.id %>"><%= c.name %></option><% }); %>
+      </select>
+      <button type="submit" id="bulkDelete" style="height:36px;padding:0 13px;border:1px solid var(--danger);border-radius:9px;background:var(--surface);color:var(--danger);font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;display:flex;align-items:center;gap:6px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 7h14M9 7V5h6v2M7 7l1 13h8l1-13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><%= t.delete %></button>
+      <button type="button" id="bulkClear" style="height:36px;padding:0 12px;border:1px solid var(--border);border-radius:9px;background:var(--surface);color:var(--muted);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer"><%= t.clear %></button>
+    </div>
+
+    <!-- Masaüstü tablo -->
+    <div class="prod-table" style="background:var(--surface);border:1px solid var(--border);border-radius:15px;box-shadow:var(--shadow-sm);overflow:hidden">
+      <div style="display:grid;grid-template-columns:42px 1fr 130px 110px 120px 96px;align-items:center;gap:8px;padding:11px 16px;border-bottom:1px solid var(--border);background:var(--surface-2);font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px">
+        <span style="display:flex"><input type="checkbox" id="selectAll" style="width:17px;height:17px;accent-color:var(--accent);cursor:pointer"></span>
+        <span><%= t.col_product %></span><span><%= t.col_category %></span><span><%= t.col_price %></span><span><%= t.col_status %></span><span style="text-align:right"><%= t.col_actions %></span>
+      </div>
+      <% items.forEach(function(p){ %>
+        <div style="display:grid;grid-template-columns:42px 1fr 130px 110px 120px 96px;align-items:center;gap:8px;padding:11px 16px;border-bottom:1px solid var(--border)">
+          <span style="display:flex"><input type="checkbox" class="row-check" name="ids" value="<%= p.id %>" style="width:17px;height:17px;accent-color:var(--accent);cursor:pointer"></span>
+          <div style="display:flex;align-items:center;gap:12px;min-width:0">
+            <span style="width:44px;height:44px;border-radius:9px;flex:none;background-size:cover;background-position:center;<%- thumb(p) %>"></span>
+            <div style="min-width:0">
+              <div style="font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><%= p.name %></div>
+              <div style="font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><%= p.description || '—' %></div>
+            </div>
+          </div>
+          <span style="font-size:13px;color:var(--muted)"><%= p.category_name %></span>
+          <span class="mono" style="font-size:14px;font-weight:700"><%= fmt(p.price) %></span>
+          <span><span style="font-size:11.5px;font-weight:700;padding:4px 9px;border-radius:20px;<%= avail(p) %>"><%= p.is_available ? t.st_available : t.st_out %></span></span>
+          <div style="display:flex;gap:5px;justify-content:flex-end">
+            <a href="/admin/products/<%= p.id %>/edit" title="Edit" class="hov-edit" style="width:32px;height:32px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);display:flex;align-items:center;justify-content:center"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M4 20h4L18.5 9.5a2 2 0 0 0-3-3L5 17v3z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></a>
+            <button type="button" class="row-del hov-danger" data-id="<%= p.id %>" data-name="<%= p.name %>" title="Delete" style="width:32px;height:32px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 7h14M9 7V5h6v2M7 7l1 13h8l1-13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          </div>
+        </div>
+      <% }); %>
+    </div>
+
+    <!-- Mobil kartlar -->
+    <div class="prod-cards">
+      <% items.forEach(function(p){ %>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow-sm);padding:13px;display:flex;gap:13px">
+          <span style="width:64px;height:64px;border-radius:11px;flex:none;background-size:cover;background-position:center;<%- thumb(p) %>"></span>
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;align-items:flex-start;gap:8px">
+              <div style="flex:1;min-width:0">
+                <div style="font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><%= p.name %></div>
+                <div style="font-size:12.5px;color:var(--muted)"><%= p.category_name %></div>
+              </div>
+              <input type="checkbox" class="row-check" name="ids" value="<%= p.id %>" style="width:19px;height:19px;accent-color:var(--accent);cursor:pointer;flex:none;margin-top:2px">
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:9px">
+              <span class="mono" style="font-size:16px;font-weight:800"><%= fmt(p.price) %></span>
+              <span style="font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;<%= avail(p) %>"><%= p.is_available ? t.st_available : t.st_out %></span>
+              <div style="flex:1"></div>
+              <a href="/admin/products/<%= p.id %>/edit" style="width:38px;height:38px;border:1px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text);display:flex;align-items:center;justify-content:center"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M4 20h4L18.5 9.5a2 2 0 0 0-3-3L5 17v3z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></a>
+              <button type="button" class="row-del" data-id="<%= p.id %>" data-name="<%= p.name %>" style="width:38px;height:38px;border:1px solid var(--border);border-radius:10px;background:var(--surface);color:var(--danger);cursor:pointer;display:flex;align-items:center;justify-content:center"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M5 7h14M9 7V5h6v2M7 7l1 13h8l1-13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            </div>
+          </div>
+        </div>
+      <% }); %>
+    </div>
+  </form>
+
+  <!-- Tekil silme için gizli form (JS doldurur) -->
+  <form id="deleteForm" method="POST" style="display:none"><input type="hidden" name="_csrf" value="<%= csrfToken %>"></form>
+  <% } %>
+</div>
+
+<%- include('../partials/admin-bottom') %>

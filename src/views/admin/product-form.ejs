@@ -1,0 +1,100 @@
+<%- include('../partials/head', { title: pageTitle }) %>
+<%- include('../partials/admin-top') %>
+
+<%
+  const hasImg = !!item.image_url;
+  const isUrl = hasImg && /^https?:/i.test(item.image_url);
+  const tabActive = 'height:32px;padding:0 14px;border:none;border-radius:8px;font-size:12.5px;font-weight:700;font-family:inherit;cursor:pointer;flex:1;background:var(--surface);color:var(--accent);box-shadow:var(--shadow-sm)';
+  const tabIdle = 'height:32px;padding:0 14px;border:none;border-radius:8px;font-size:12.5px;font-weight:700;font-family:inherit;cursor:pointer;flex:1;background:transparent;color:var(--muted)';
+%>
+
+<div class="animate-pop" style="max-width:860px;margin:0 auto">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
+    <a href="/admin/products" class="hov-surface" style="height:38px;padding:0 13px;border:1px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text);font-size:13.5px;font-weight:600;display:flex;align-items:center;gap:7px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><%= t.back %></a>
+    <h2 style="margin:0;font-size:20px;font-weight:800;letter-spacing:-.3px"><%= pageTitle %></h2>
+  </div>
+
+  <form method="POST" action="<%= formAction %>" enctype="multipart/form-data" style="background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);overflow:hidden">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+    <% if (error) { %>
+      <div role="alert" class="animate-slide" style="margin:16px 20px 0;display:flex;gap:10px;align-items:center;background:var(--danger-soft);border:1px solid var(--danger);color:var(--danger);border-radius:11px;padding:10px 12px;font-size:13px">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" style="flex:none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 7v6M12 16.5v.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <span><%= error %></span>
+      </div>
+    <% } %>
+
+    <div class="form-split" style="padding:20px">
+      <!-- Sol kolon: görsel -->
+      <div>
+        <label style="display:block;font-size:12.5px;font-weight:600;color:var(--muted);margin-bottom:8px"><%= t.image %></label>
+        <div id="imgPreview" style="aspect-ratio:4/3;border-radius:13px;border:1px solid var(--border);overflow:hidden;background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center;<%- hasImg ? ('background-image:url(' + encodeURI(item.image_url) + ');background-color:var(--surface-2)') : 'background:var(--surface-2)' %>">
+          <div id="imgPlaceholder" style="text-align:center;color:var(--muted-2);<%= hasImg ? 'display:none' : '' %>">
+            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" style="margin-bottom:6px"><rect x="3" y="4" width="18" height="16" rx="2" stroke="currentColor" stroke-width="1.6"/><circle cx="8.5" cy="9.5" r="1.6" stroke="currentColor" stroke-width="1.4"/><path d="M21 16l-5-5L5 20" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div class="mono" style="font-size:11.5px"><%= t.no_image %></div>
+          </div>
+        </div>
+
+        <div style="display:flex;width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:3px;gap:3px;margin-top:12px">
+          <button type="button" id="tabUpload" style="<%- isUrl ? tabIdle : tabActive %>"><%= t.upload %></button>
+          <button type="button" id="tabUrl" style="<%- isUrl ? tabActive : tabIdle %>"><%= t.via_url %></button>
+        </div>
+
+        <div id="paneUpload" style="<%= isUrl ? 'display:none' : '' %>">
+          <label class="hov-edit" style="margin-top:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;height:78px;border:1.5px dashed var(--border-strong);border-radius:11px;cursor:pointer;color:var(--muted);background:var(--surface-2)">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 16V4M7 9l5-5 5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 17v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            <span style="font-size:12.5px;font-weight:600" id="fileLabel"><%= t.choose_file %></span>
+            <input id="fileInput" name="image_file" type="file" accept="image/*" style="display:none">
+          </label>
+        </div>
+        <div id="paneUrl" style="<%= isUrl ? '' : 'display:none' %>">
+          <input id="urlInput" name="image_url" value="<%= isUrl ? item.image_url : '' %>" placeholder="https://…/foto.jpg" class="mono" style="margin-top:10px;width:100%;height:42px;padding:0 13px;border:1px solid var(--border-strong);border-radius:10px;background:var(--surface-2);color:var(--text);font-size:13.5px">
+        </div>
+        <p style="margin:8px 0 0;font-size:11.5px;color:var(--muted-2)"><%= t.image_optional %></p>
+      </div>
+
+      <!-- Sağ kolon: alanlar -->
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div>
+          <label style="display:block;font-size:12.5px;font-weight:600;color:var(--muted);margin-bottom:6px"><%= t.category %></label>
+          <select name="category_id" style="width:100%;height:44px;padding:0 13px;border:1px solid var(--border-strong);border-radius:10px;background:var(--surface-2);color:var(--text);font-size:14px;font-family:inherit;cursor:pointer">
+            <% categories.forEach(function(c){ %><option value="<%= c.id %>"<%= String(item.category_id) === String(c.id) ? ' selected' : '' %>><%= c.name %></option><% }); %>
+          </select>
+          <p style="margin:6px 0 0;font-size:11.5px;color:var(--muted-2)"><%= t.category_move_hint %></p>
+        </div>
+        <div>
+          <label style="display:block;font-size:12.5px;font-weight:600;color:var(--muted);margin-bottom:6px"><%= t.product_name %></label>
+          <input name="name" value="<%= item.name %>" required placeholder="<%= t.product_name_ph %>" style="width:100%;height:44px;padding:0 13px;border:1px solid var(--border-strong);border-radius:10px;background:var(--surface-2);color:var(--text);font-size:14px;font-family:inherit">
+        </div>
+        <div>
+          <label style="display:block;font-size:12.5px;font-weight:600;color:var(--muted);margin-bottom:6px"><%= t.description %></label>
+          <textarea name="description" rows="3" placeholder="<%= t.description_ph %>" style="width:100%;padding:11px 13px;border:1px solid var(--border-strong);border-radius:10px;background:var(--surface-2);color:var(--text);font-size:14px;font-family:inherit;resize:vertical;line-height:1.5"><%= item.description %></textarea>
+        </div>
+        <div>
+          <label style="display:block;font-size:12.5px;font-weight:600;color:var(--muted);margin-bottom:6px"><%= t.price %></label>
+          <div style="position:relative">
+            <span class="mono" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted);font-weight:700">₺</span>
+            <input name="price" type="number" min="0" step="0.5" value="<%= item.price %>" placeholder="0" class="mono" style="width:100%;height:44px;padding:0 13px 0 32px;border:1px solid var(--border-strong);border-radius:10px;background:var(--surface-2);color:var(--text);font-size:14px">
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 15px;border:1px solid var(--border);border-radius:12px;background:var(--surface-2)">
+          <div>
+            <div style="font-size:14px;font-weight:600"><%= t.in_stock %></div>
+            <div id="availDesc" style="font-size:12px;color:var(--muted)" data-on="<%= t.avail_on %>" data-off="<%= t.avail_off %>"><%= item.is_available ? t.avail_on : t.avail_off %></div>
+          </div>
+          <label class="switch" style="flex:none">
+            <input type="checkbox" name="is_available" value="1" id="availInput"<%= item.is_available ? ' checked' : '' %>>
+            <span class="switch-track"><span class="switch-knob"></span></span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:10px;justify-content:flex-end;padding:16px 20px;border-top:1px solid var(--border);background:var(--surface-2)">
+      <a href="/admin/products" class="hov-surface3" style="height:44px;padding:0 18px;border:1px solid var(--border-strong);border-radius:10px;background:var(--surface);color:var(--text);font-size:14.5px;font-weight:600;display:flex;align-items:center"><%= t.cancel %></a>
+      <button type="submit" class="hov-accent" style="height:44px;padding:0 22px;border:none;border-radius:10px;background:var(--accent);color:var(--on-accent);font-size:14.5px;font-weight:700;font-family:inherit;cursor:pointer;box-shadow:var(--shadow)"><%= t.save_product %></button>
+    </div>
+  </form>
+</div>
+
+<%- include('../partials/admin-bottom') %>

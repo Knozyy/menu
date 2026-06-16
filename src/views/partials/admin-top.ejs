@@ -1,0 +1,72 @@
+<%
+  const navItemBase = 'width:100%;height:42px;display:flex;align-items:center;gap:11px;padding:0 12px;border:none;border-radius:10px;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;transition:background .12s;text-decoration:none;';
+%>
+<div style="display:flex;min-height:100vh">
+
+  <!-- Sidebar (masaüstü) -->
+  <aside class="sidebar" style="width:248px;flex:none;background:var(--surface);border-right:1px solid var(--border);flex-direction:column;position:sticky;top:0;height:100vh">
+    <div style="padding:20px 18px;display:flex;align-items:center;gap:11px;border-bottom:1px solid var(--border)">
+      <div style="width:38px;height:38px;border-radius:11px;background:var(--accent);color:var(--on-accent);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px">ÇV</div>
+      <div style="min-width:0">
+        <div style="font-size:14.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><%= brand %></div>
+        <div style="font-size:11.5px;color:var(--muted)"><%= t.admin_panel %></div>
+      </div>
+    </div>
+    <nav style="padding:14px 12px;display:flex;flex-direction:column;gap:4px;flex:1">
+      <% nav.forEach(function(n){ const active = n.key === activeNav; %>
+        <a href="<%= n.href %>" class="<%= active ? '' : 'hov-surface' %>" aria-current="<%= active ? 'page' : 'false' %>"
+           style="<%= navItemBase %><%= active ? 'background:var(--accent-soft);color:var(--accent)' : 'background:transparent;color:var(--muted)' %>">
+          <span style="display:flex;width:20px;height:20px;flex:none"><%- n.icon %></span>
+          <span style="flex:1;text-align:left"><%= n.label %></span>
+        </a>
+      <% }); %>
+    </nav>
+    <div style="padding:12px;border-top:1px solid var(--border)">
+      <form method="POST" action="/admin/logout">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <button type="submit" class="hov-danger" style="width:100%;height:42px;display:flex;align-items:center;gap:10px;padding:0 12px;border:1px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text);font-size:14px;font-weight:600;font-family:inherit;cursor:pointer">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 17l5-5-5-5M20 12H9M9 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <%= t.logout %>
+        </button>
+      </form>
+    </div>
+  </aside>
+
+  <!-- Ana kolon -->
+  <div class="main-col" style="flex:1;min-width:0;display:flex;flex-direction:column">
+    <!-- Üst bar -->
+    <header style="position:sticky;top:0;z-index:30;background:var(--surface);border-bottom:1px solid var(--border);padding:12px 18px;display:flex;align-items:center;gap:12px">
+      <div class="only-mobile" style="align-items:center;gap:9px;flex:none">
+        <div style="width:32px;height:32px;border-radius:9px;background:var(--accent);color:var(--on-accent);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px">ÇV</div>
+        <span style="font-size:15px;font-weight:700"><%= brand %></span>
+      </div>
+      <div class="only-desktop" style="flex:none">
+        <div style="font-size:17px;font-weight:700;letter-spacing:-.2px"><%= pageTitle %></div>
+        <% if (pageSub) { %><div style="font-size:12.5px;color:var(--muted)"><%= pageSub %></div><% } %>
+      </div>
+      <div style="flex:1"></div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <form method="POST" action="/prefs/lang" style="display:inline"><input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <button type="submit" title="Language" class="hov-surface" style="height:36px;padding:0 12px;border:1px solid var(--border);border-radius:9px;background:var(--surface);color:var(--text);font-size:12.5px;font-weight:700;font-family:inherit;cursor:pointer"><%= langLabel %></button>
+        </form>
+        <form method="POST" action="/prefs/theme" style="display:inline"><input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <button type="submit" title="Theme" class="hov-surface" style="width:36px;height:36px;border:1px solid var(--border);border-radius:9px;background:var(--surface);color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center">
+            <% if (theme === 'dark') { %>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4.5" stroke="currentColor" stroke-width="2"/><path d="M12 2v2M12 20v2M4 12H2M22 12h-2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            <% } else { %>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+            <% } %>
+          </button>
+        </form>
+        <div style="display:flex;align-items:center;gap:9px;padding-left:6px;margin-left:2px;border-left:1px solid var(--border)">
+          <div style="width:34px;height:34px;border-radius:50%;background:var(--surface-3);color:var(--text);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px">A</div>
+          <div class="only-desktop" style="line-height:1.2">
+            <div style="font-size:13px;font-weight:600"><%= t.admin_name %></div>
+            <div style="font-size:11px;color:var(--muted)"><%= t.role %></div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- İçerik -->
+    <main style="flex:1;padding:20px 18px;max-width:1180px;width:100%;margin:0 auto">

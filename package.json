@@ -1,0 +1,25 @@
+{
+  "name": "qr-menu",
+  "version": "1.0.0",
+  "description": "Çam Vadisi — QR ile erişilen dijital menü ve yönetim paneli",
+  "main": "src/app.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node --disable-warning=ExperimentalWarning src/app.js",
+    "dev": "node --disable-warning=ExperimentalWarning --watch src/app.js"
+  },
+  "engines": {
+    "node": ">=22.5"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "csrf-sync": "^4.0.3",
+    "ejs": "^3.1.10",
+    "express": "^4.21.0",
+    "express-rate-limit": "^7.4.0",
+    "express-session": "^1.18.0",
+    "helmet": "^8.0.0",
+    "multer": "^2.2.0",
+    "session-file-store": "^1.5.0"
+  }
+}

@@ -1,0 +1,121 @@
+/* ==========================================================================
+   Çam Vadisi — tasarımdan taşınan değişken sistemi + tema + responsive yardımcılar
+   (Tasarım inline style kullanıyor; burada yalnızca değişkenler, hover ve
+    medya-sorgusu gerektiren responsive kurallar tanımlı.)
+   ========================================================================== */
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+/* ---- public menü: kategori çipleri ---- */
+.cat-chip { transition: background .15s, color .15s, border-color .15s; }
+.cat-chip.active { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+#catNav::-webkit-scrollbar { display: none; }
+
+:root {
+  --bg:#f3f4f6; --surface:#ffffff; --surface-2:#f6f7f9; --surface-3:#eef0f3;
+  --border:#e3e6ea; --border-strong:#d3d8df;
+  --text:#15181d; --muted:#697586; --muted-2:#98a2b3;
+  --accent:#2563eb; --accent-hover:#1d4ed8; --accent-soft:rgba(37,99,235,.10); --on-accent:#ffffff;
+  --danger:#dc2626; --danger-soft:rgba(220,38,38,.10);
+  --ok:#1f7a4d; --ok-soft:rgba(31,122,77,.12);
+  --warn-bg:#fff7ed; --warn-border:#fed7aa; --warn-text:#9a3412;
+  --shadow-sm:0 1px 2px rgba(16,24,40,.06);
+  --shadow:0 1px 3px rgba(16,24,40,.08),0 1px 2px rgba(16,24,40,.05);
+  --shadow-lg:0 12px 32px rgba(16,24,40,.12),0 4px 8px rgba(16,24,40,.06);
+}
+[data-theme="dark"] {
+  --bg:#0d0f13; --surface:#161922; --surface-2:#1b1f2a; --surface-3:#222735;
+  --border:#262b36; --border-strong:#333a48;
+  --text:#e8eaef; --muted:#9aa4b2; --muted-2:#69727f;
+  --accent:#3b82f6; --accent-hover:#60a5fa; --accent-soft:rgba(59,130,246,.16); --on-accent:#ffffff;
+  --danger:#f87171; --danger-soft:rgba(248,113,113,.14);
+  --ok:#4ade80; --ok-soft:rgba(74,222,128,.14);
+  --warn-bg:#3a2a16; --warn-border:#7c4a1e; --warn-text:#fcd9a8;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.5);
+  --shadow:0 2px 6px rgba(0,0,0,.5);
+  --shadow-lg:0 16px 40px rgba(0,0,0,.6);
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Public Sans', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  transition: background .2s, color .2s;
+}
+
+::placeholder { color: var(--muted-2); }
+a { color: inherit; text-decoration: none; }
+
+@keyframes pop { from { opacity:0; transform:translateY(6px) scale(.99); } to { opacity:1; transform:none; } }
+@keyframes slidein { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:none; } }
+
+input:focus, select:focus, textarea:focus, button:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 1px;
+}
+
+.mono { font-family: 'IBM Plex Mono', monospace; }
+
+/* ---- stok aç/kapa anahtarı (saf CSS, JS gerektirmez) ---- */
+.switch { display: inline-flex; cursor: pointer; }
+.switch input { position: absolute; opacity: 0; width: 0; height: 0; }
+.switch-track {
+  width: 50px; height: 28px; border-radius: 20px;
+  background: var(--border-strong); position: relative; display: inline-block;
+  transition: background .18s;
+}
+.switch-knob {
+  position: absolute; top: 3px; left: 3px; width: 22px; height: 22px;
+  border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.3);
+  transition: left .18s;
+}
+.switch input:checked + .switch-track { background: var(--accent); }
+.switch input:checked + .switch-track .switch-knob { left: 25px; }
+.switch input:focus-visible + .switch-track { outline: 2px solid var(--accent); outline-offset: 2px; }
+.animate-pop { animation: pop .35s ease both; }
+.animate-slide { animation: slidein .25s ease both; }
+
+/* ---- hover yardımcıları (inline style :hover yapamadığı için) ---- */
+.hov-surface:hover  { background: var(--surface-2); }
+.hov-surface3:hover { background: var(--surface-3); }
+.hov-accent:hover   { background: var(--accent-hover) !important; }
+.hov-edit:hover     { border-color: var(--accent) !important; color: var(--accent) !important; }
+.hov-danger:hover   { border-color: var(--danger) !important; color: var(--danger) !important; }
+.hov-row:hover      { background: var(--surface-2); }
+
+/* ==========================================================================
+   Responsive — tasarımdaki JS "isMobile (<880px)" kuralları CSS'e taşındı
+   ========================================================================== */
+.only-desktop { display: initial; }
+.only-mobile  { display: none; }
+
+.sidebar    { display: flex; }
+.bottom-nav { display: none; }
+
+.stat-grid  { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.dash-split { display: grid; grid-template-columns: 1.6fr 1fr; gap: 14px; }
+.cat-split  { display: grid; grid-template-columns: 1.7fr 1fr; gap: 16px; align-items: start; }
+.form-split { display: grid; grid-template-columns: 300px 1fr; gap: 22px; }
+
+.prod-table { display: block; }
+.prod-cards { display: none; }
+
+@media (max-width: 880px) {
+  .only-desktop { display: none !important; }
+  .only-mobile  { display: flex; }
+
+  .sidebar    { display: none; }
+  .bottom-nav { display: flex; }
+
+  .main-col   { padding-bottom: 72px; }
+
+  .stat-grid  { grid-template-columns: repeat(2, 1fr); }
+  .dash-split { grid-template-columns: 1fr; }
+  .cat-split  { grid-template-columns: 1fr; }
+  .form-split { grid-template-columns: 1fr; }
+
+  .prod-table { display: none; }
+  .prod-cards { display: flex; flex-direction: column; gap: 11px; }
+}

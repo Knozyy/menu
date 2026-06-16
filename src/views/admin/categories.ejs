@@ -1,0 +1,59 @@
+<%- include('../partials/head', { title: pageTitle }) %>
+<%- include('../partials/admin-top') %>
+
+<div class="animate-pop cat-split">
+  <!-- Liste -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:15px;box-shadow:var(--shadow-sm);overflow:hidden">
+    <div style="padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+      <h3 style="margin:0;font-size:15px;font-weight:700"><%= t.categories %></h3>
+      <span style="font-size:12px;color:var(--muted)"><%= t.drag_hint %></span>
+    </div>
+
+    <% if (warn) { %>
+      <div role="alert" class="animate-slide" style="margin:12px 16px 0;display:flex;gap:11px;align-items:flex-start;background:var(--warn-bg);border:1px solid var(--warn-border);color:var(--warn-text);border-radius:11px;padding:12px;font-size:13px">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="flex:none;margin-top:1px"><path d="M12 3l9 16H3l9-16z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 10v4M12 16.5v.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <span style="flex:1"><%= warn %></span>
+        <a href="/admin/categories" style="color:inherit;font-size:18px;line-height:1">×</a>
+      </div>
+    <% } %>
+
+    <div style="padding:8px">
+      <% categories.forEach(function(c, i){ %>
+        <div class="<%= editId === c.id ? '' : 'hov-row' %>" style="display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:11px">
+          <span style="width:26px;height:26px;flex:none;border-radius:7px;background:var(--surface-3);color:var(--muted);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700" class="mono"><%= i + 1 %></span>
+
+          <% if (editId === c.id) { %>
+            <form method="POST" action="/admin/categories/<%= c.id %>/edit" style="flex:1;display:flex;gap:6px;align-items:center">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <input name="name" value="<%= c.name %>" autofocus style="flex:1;height:36px;padding:0 11px;border:1px solid var(--accent);border-radius:9px;background:var(--surface-2);color:var(--text);font-size:14px;font-family:inherit">
+              <button type="submit" class="hov-accent" style="height:36px;padding:0 13px;border:none;border-radius:9px;background:var(--accent);color:var(--on-accent);font-size:13px;font-weight:700;font-family:inherit;cursor:pointer"><%= t.save %></button>
+              <a href="/admin/categories" style="height:36px;width:36px;border:1px solid var(--border);border-radius:9px;background:var(--surface);color:var(--muted);display:flex;align-items:center;justify-content:center">×</a>
+            </form>
+          <% } else { %>
+            <span style="flex:1;font-size:14.5px;font-weight:600"><%= c.name %></span>
+            <span class="mono" style="font-size:11.5px;color:var(--muted);margin-right:2px"><%= c.item_count %><%= t.items_suffix %></span>
+            <div style="display:flex;gap:4px">
+              <form method="POST" action="/admin/categories/<%= c.id %>/move/up"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button type="submit" title="Up" class="hov-surface" style="width:32px;height:32px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center"<%= i === 0 ? ' disabled' : '' %>><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 19V5M5 12l7-7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button></form>
+              <form method="POST" action="/admin/categories/<%= c.id %>/move/down"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button type="submit" title="Down" class="hov-surface" style="width:32px;height:32px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12l7 7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button></form>
+              <a href="/admin/categories?edit=<%= c.id %>" title="Edit" class="hov-edit" style="width:32px;height:32px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);display:flex;align-items:center;justify-content:center"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M4 20h4L18.5 9.5a2 2 0 0 0-3-3L5 17v3z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></a>
+              <form method="POST" action="/admin/categories/<%= c.id %>/delete" onsubmit="return confirm('<%= c.name %> — silinsin mi?')"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button type="submit" title="Delete" class="hov-danger" style="width:32px;height:32px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 7h14M9 7V5h6v2M7 7l1 13h8l1-13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button></form>
+            </div>
+          <% } %>
+        </div>
+      <% }); %>
+      <% if (!categories.length) { %><div style="padding:24px 10px;font-size:13px;color:var(--muted)"><%= t.no_products %></div><% } %>
+    </div>
+  </div>
+
+  <!-- Yeni kategori formu -->
+  <form method="POST" action="/admin/categories" style="background:var(--surface);border:1px solid var(--border);border-radius:15px;box-shadow:var(--shadow-sm);padding:18px;position:sticky;top:84px">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <h3 style="margin:0 0 4px;font-size:15px;font-weight:700"><%= t.new_category %></h3>
+    <p style="margin:0 0 14px;font-size:12.5px;color:var(--muted)"><%= t.new_category_sub %></p>
+    <label style="display:block;font-size:12.5px;font-weight:600;color:var(--muted);margin-bottom:6px"><%= t.category_name %></label>
+    <input name="name" required placeholder="<%= t.category_ph %>" style="width:100%;height:42px;padding:0 13px;border:1px solid var(--border-strong);border-radius:10px;background:var(--surface-2);color:var(--text);font-size:14px;font-family:inherit;margin-bottom:14px">
+    <button type="submit" class="hov-accent" style="width:100%;height:44px;border:none;border-radius:10px;background:var(--accent);color:var(--on-accent);font-size:14.5px;font-weight:700;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg><%= t.add_category %></button>
+  </form>
+</div>
+
+<%- include('../partials/admin-bottom') %>
