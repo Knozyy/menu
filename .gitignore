@@ -6,6 +6,11 @@ data/*.db-wal
 data/*.db-shm
 data/sessions/
 server.log
+run.log
+# TLS sertifika/anahtarları asla commit edilmez
+*.pem
+*.key
+*.crt
 public/uploads/*
 !public/uploads/.gitkeep
 npm-debug.log*

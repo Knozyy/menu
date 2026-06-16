@@ -149,6 +149,33 @@ app.listen(PORT, () => {
   console.log(`Yönetim paneli      → http://localhost:${PORT}/admin`);
 });
 
+// İsteğe bağlı HTTPS: .env'de TLS_CERT + TLS_KEY tanımlıysa ek olarak HTTPS de dinle.
+// (Yerel test için mkcert/openssl sertifikası; üretimde genelde önde bir reverse proxy olur.)
+startHttpsIfConfigured();
+
+function startHttpsIfConfigured() {
+  const certPath = process.env.TLS_CERT;
+  const keyPath = process.env.TLS_KEY;
+  if (!certPath || !keyPath) return;
+
+  const fs = require('fs');
+  if (!fs.existsSync(certPath) || !fs.existsSync(keyPath)) {
+    console.warn(`[https] TLS_CERT/TLS_KEY tanımlı ama dosya bulunamadı — HTTPS atlandı.`);
+    console.warn(`        cert: ${certPath}\n        key:  ${keyPath}`);
+    return;
+  }
+  try {
+    const https = require('https');
+    const httpsPort = process.env.HTTPS_PORT || 2443;
+    const options = { cert: fs.readFileSync(certPath), key: fs.readFileSync(keyPath) };
+    https.createServer(options, app).listen(httpsPort, () => {
+      console.log(`HTTPS (TLS)         → https://localhost:${httpsPort}`);
+    });
+  } catch (err) {
+    console.error('[https] HTTPS başlatılamadı:', err.message);
+  }
+}
+
 // ---------- küçük yardımcılar (ek bağımlılık olmadan cookie + .env) ----------
 function readCookie(req, name) {
   const raw = req.headers.cookie;
