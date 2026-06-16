@@ -38,8 +38,14 @@ app.use(
         imgSrc: ["'self'", 'data:', 'https:'],
         scriptSrc: ["'self'"],
         objectSrc: ["'none'"],
+        // HTTP sunucuda bu yönerge tarayıcının tüm kaynakları HTTPS'e
+        // yükseltmesine neden olur — SSL yoksa CSS/JS/font yüklenemez.
+        upgradeInsecureRequests: null,
       },
     },
+    // Google Fonts gibi çapraz kaynak (cross-origin) isteklerin
+    // engellenmesini önler. Helmet v8 bunu varsayılan olarak etkinleştirir.
+    crossOriginEmbedderPolicy: false,
   })
 );
 
@@ -144,7 +150,9 @@ function readCookie(req, name) {
   const raw = req.headers.cookie;
   if (!raw) return null;
   const found = raw.split(';').map((c) => c.trim()).find((c) => c.startsWith(name + '='));
-  return found ? decodeURIComponent(found.slice(name.length + 1)) : null;
+  if (!found) return null;
+  try { return decodeURIComponent(found.slice(name.length + 1)); }
+  catch (_) { return null; }
 }
 function setCookie(res, name, value) {
   res.cookie
@@ -179,7 +187,11 @@ function loadDotEnv() {
     if (!fs.existsSync(envPath)) return;
     for (const line of fs.readFileSync(envPath, 'utf8').split('\n')) {
       const m = line.match(/^\s*([\w.-]+)\s*=\s*(.*)\s*$/);
-      if (m && !(m[1] in process.env)) process.env[m[1]] = m[2].replace(/^["']|["']$/g, '');
+      if (m && !(m[1] in process.env)) {
+        // Windows CRLF satır sonlarından kalan \r karakterini temizle
+        const value = m[2].replace(/^["']|["']$/g, '').replace(/\r$/, '');
+        process.env[m[1]] = value;
+      }
     }
   } catch (_) {
     /* yok say */
