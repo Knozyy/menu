@@ -15,6 +15,10 @@
 
   <!-- Sticky başlık + kategori çipleri + arama -->
   <header class="menu-header">
+    <form method="POST" action="/prefs/lang" class="lang-toggle">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <button type="submit" aria-label="<%= lang === 'tr' ? 'Switch to English' : 'Türkçe\'ye geç' %>"><%= langLabel %></button>
+    </form>
     <div class="brand-row">
       <div class="brand"><%= brand %></div>
       <div class="tagline"><%= lang === 'tr' ? 'Dijital Menü' : 'Digital Menu' %></div>

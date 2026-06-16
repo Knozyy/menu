@@ -97,7 +97,7 @@ const loginLimiter = rateLimit({
 
 // --- Şablonlara aktarılan ortak değişkenler (locals) ---
 app.use((req, res, next) => {
-  const lang = i18n.resolveLang(readCookie(req, 'lang') || process.env.DEFAULT_LANG || 'tr');
+  const lang = effectiveLang(req);
   const theme = readCookie(req, 'theme') === 'dark' ? 'dark' : 'light';
 
   res.locals.lang = lang;
@@ -123,7 +123,8 @@ app.post('/prefs/:key', (req, res) => {
     const to = readCookie(req, 'theme') === 'dark' ? 'light' : 'dark';
     setCookie(res, 'theme', to);
   } else if (key === 'lang') {
-    const to = i18n.resolveLang(readCookie(req, 'lang')) === 'tr' ? 'en' : 'tr';
+    // Gösterilen (etkin) dile göre ters çevir — otomatik algılamayla tutarlı olsun
+    const to = effectiveLang(req) === 'tr' ? 'en' : 'tr';
     setCookie(res, 'lang', to);
   }
   res.redirect(back);
@@ -161,6 +162,17 @@ function setCookie(res, name, value) {
   res.cookie
     ? res.cookie(name, value, { httpOnly: false, sameSite: 'lax', maxAge: 1000 * 60 * 60 * 24 * 365 })
     : res.setHeader('Set-Cookie', `${name}=${value}; Path=/; Max-Age=31536000; SameSite=Lax`);
+}
+// Çerez yoksa telefon/tarayıcı dilinden otomatik seç: Türkçe ise tr, başka her dilde en.
+function detectLang(req) {
+  const al = (req.headers['accept-language'] || '').toLowerCase();
+  if (!al) return i18n.resolveLang(process.env.DEFAULT_LANG || 'tr');
+  return /\btr\b/.test(al) ? 'tr' : 'en';
+}
+// Kullanıcının açık tercihi (çerez) varsa o kazanır; yoksa otomatik algılama.
+function effectiveLang(req) {
+  const explicit = readCookie(req, 'lang');
+  return explicit ? i18n.resolveLang(explicit) : detectLang(req);
 }
 // Navigasyon tanımı (ikonlar tasarımdan). Hem sidebar hem alt bar bunu kullanır.
 function buildNav(t) {
