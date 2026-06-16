@@ -1,76 +1,102 @@
-<%- include('../partials/head', { title: brand }) %>
-<%
-  // NOT: Bu, menü tasarımı (menu-preview.html) gelene kadar geçici ama çalışır
-  // bir müşteri menüsüdür. Aynı tasarım sistemini (CSS değişkenleri, fontlar)
-  // kullanır. Tasarım paylaşıldığında bu şablon onunla değiştirilecek.
-  function thumb(p){
-    return p.image_url
-      ? 'background-image:url(' + encodeURI(p.image_url) + ')'
-      : 'background-image:repeating-linear-gradient(45deg,var(--surface-2),var(--surface-2) 9px,var(--surface-3) 9px,var(--surface-3) 18px)';
-  }
-%>
+<!DOCTYPE html>
+<html lang="<%= lang %>" data-theme="<%= theme %>">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="<%= theme === 'dark' ? '#0d1016' : '#f4f6fc' %>">
+  <title><%= brand %> · <%= lang === 'tr' ? 'Menü' : 'Menu' %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/menu.css">
+</head>
+<body>
+<div class="menu-shell" id="top">
 
-<div style="max-width:680px;margin:0 auto;min-height:100vh;background:var(--bg)">
-
-  <!-- Sticky başlık + kategori sekmeleri -->
-  <header style="position:sticky;top:0;z-index:20;background:var(--surface);border-bottom:1px solid var(--border);backdrop-filter:saturate(1.4)">
-    <div style="display:flex;align-items:center;gap:11px;padding:16px 18px 12px">
-      <div style="width:40px;height:40px;border-radius:12px;background:var(--accent);color:var(--on-accent);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;box-shadow:var(--shadow)">ÇV</div>
-      <div style="flex:1;min-width:0">
-        <div style="font-size:18px;font-weight:800;letter-spacing:-.3px"><%= brand %></div>
-        <div style="font-size:12px;color:var(--muted)"><%= lang === 'tr' ? 'Dijital Menü' : 'Digital Menu' %></div>
-      </div>
-      <form method="POST" action="/prefs/theme"><input type="hidden" name="_csrf" value="<%= csrfToken %>">
-        <button type="submit" title="Theme" class="hov-surface" style="width:36px;height:36px;border:1px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center">
-          <% if (theme === 'dark') { %>
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4.5" stroke="currentColor" stroke-width="2"/><path d="M12 2v2M12 20v2M4 12H2M22 12h-2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-          <% } else { %>
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
-          <% } %>
-        </button>
-      </form>
+  <!-- Sticky başlık + kategori çipleri + arama -->
+  <header class="menu-header">
+    <div class="brand-row">
+      <div class="brand"><%= brand %></div>
+      <div class="tagline"><%= lang === 'tr' ? 'Dijital Menü' : 'Digital Menu' %></div>
     </div>
     <% if (categories.length) { %>
-      <nav id="catNav" style="display:flex;gap:8px;overflow-x:auto;padding:0 18px 12px;scrollbar-width:none">
+      <nav class="chips" id="catNav">
         <% categories.forEach(function(c, i){ %>
-          <a href="#cat-<%= c.id %>" class="cat-chip<%= i === 0 ? ' active' : '' %>" data-target="cat-<%= c.id %>" style="flex:none;height:34px;display:flex;align-items:center;padding:0 14px;border-radius:20px;border:1px solid var(--border);background:var(--surface-2);color:var(--muted);font-size:13.5px;font-weight:700;white-space:nowrap"><%= c.name %></a>
+          <a href="#cat-<%= c.id %>" class="chip<%= i === 0 ? ' active' : '' %>" data-target="cat-<%= c.id %>"><%= c.name %></a>
         <% }); %>
       </nav>
     <% } %>
+    <div class="search-wrap" id="searchWrap">
+      <input id="dishSearch" type="search" inputmode="search" placeholder="<%= lang === 'tr' ? 'Yemek ara…' : 'Search dishes…' %>" autocomplete="off">
+    </div>
   </header>
 
-  <main style="padding:8px 14px 48px">
+  <main>
     <% if (!categories.length) { %>
-      <div style="text-align:center;color:var(--muted);padding:80px 20px">
-        <div style="font-size:16px;font-weight:600;color:var(--text)"><%= lang === 'tr' ? 'Menü hazırlanıyor' : 'Menu coming soon' %></div>
-      </div>
+      <div class="no-results" style="display:block"><%= lang === 'tr' ? 'Menü yakında' : 'Menu coming soon' %></div>
     <% } %>
 
     <% categories.forEach(function(c){ %>
-      <section id="cat-<%= c.id %>" style="scroll-margin-top:120px;padding-top:18px">
-        <h2 style="margin:0 0 12px;font-size:19px;font-weight:800;letter-spacing:-.3px;padding-left:4px"><%= c.name %></h2>
-        <div style="display:flex;flex-direction:column;gap:10px">
+      <section class="cat-section" id="cat-<%= c.id %>" data-cat>
+        <h2 class="cat-title"><%= c.name %></h2>
+        <div class="dish-list">
           <% c.items.forEach(function(p){ %>
-            <article style="display:flex;gap:14px;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:12px;box-shadow:var(--shadow-sm)">
-              <div style="width:88px;height:88px;flex:none;border-radius:12px;background-size:cover;background-position:center;<%- thumb(p) %>"></div>
-              <div style="flex:1;min-width:0;display:flex;flex-direction:column">
-                <div style="font-size:16px;font-weight:700;letter-spacing:-.2px"><%= p.name %></div>
-                <% if (p.description) { %><div style="font-size:13px;color:var(--muted);margin-top:3px;line-height:1.45"><%= p.description %></div><% } %>
-                <div style="flex:1"></div>
-                <div class="mono" style="font-size:16px;font-weight:800;color:var(--accent);margin-top:8px"><%= fmt(p.price) %></div>
+            <article class="dish" data-dish data-name="<%= (p.name + ' ' + (p.description || '')).toLowerCase() %>">
+              <% if (p.image_url) { %>
+                <div class="dish-photo" style="background-image:url('<%= encodeURI(p.image_url) %>')"></div>
+              <% } else { %>
+                <div class="dish-photo empty">
+                  <svg width="38" height="38" viewBox="0 0 24 24" fill="none"><path d="M7 3v8a2 2 0 0 0 2 2v8M11 3v8M9 3v4M16 3c-1.2 0-2 1.6-2 4s.8 4 2 4m0 0v6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+              <% } %>
+              <div class="dish-body">
+                <div class="dish-head">
+                  <h3 class="dish-name"><%= p.name %></h3>
+                  <span class="dish-price"><%= fmt(p.price) %></span>
+                </div>
+                <% if (p.description) { %><p class="dish-desc"><%= p.description %></p><% } %>
               </div>
             </article>
           <% }); %>
         </div>
       </section>
     <% }); %>
+
+    <div class="no-results" id="noResults"><%= lang === 'tr' ? 'Eşleşen ürün yok' : 'No matching items' %></div>
   </main>
 
-  <footer style="text-align:center;padding:24px 16px 40px;color:var(--muted-2);font-size:12px">
-    <%= brand %> · <span class="mono"><%= lang === 'tr' ? 'yalnızca görüntüleme' : 'view only' %></span>
+  <footer class="menu-foot">
+    <%= brand %> · <%= lang === 'tr' ? 'yalnızca görüntüleme' : 'view only' %>
   </footer>
-</div>
 
+  <!-- Alt navigasyon (view-only: sipariş/sepet yok) -->
+  <nav class="tabbar">
+    <button type="button" class="tab active" data-act="top">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M3 11l9-8 9 8M5 10v10h5v-6h4v6h5V10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span><%= lang === 'tr' ? 'Menü' : 'Menu' %></span>
+    </button>
+    <button type="button" class="tab" data-act="search">
+      <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <span><%= lang === 'tr' ? 'Ara' : 'Search' %></span>
+    </button>
+    <button type="button" class="tab" data-act="cats">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="7" cy="6" r="1.4" fill="currentColor"/><circle cx="7" cy="12" r="1.4" fill="currentColor"/><circle cx="7" cy="18" r="1.4" fill="currentColor"/></svg>
+      <span><%= lang === 'tr' ? 'Kategoriler' : 'Categories' %></span>
+    </button>
+    <form method="POST" action="/prefs/theme" style="flex:1;display:flex">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <button type="submit" class="tab" style="width:100%">
+        <% if (theme === 'dark') { %>
+          <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4.5" stroke="currentColor" stroke-width="2"/><path d="M12 2v2M12 20v2M4 12H2M22 12h-2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <% } else { %>
+          <svg viewBox="0 0 24 24" fill="none"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+        <% } %>
+        <span><%= lang === 'tr' ? 'Tema' : 'Theme' %></span>
+      </button>
+    </form>
+  </nav>
+
+</div>
 <script src="/js/menu.js" defer></script>
 </body>
 </html>
