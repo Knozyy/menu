@@ -90,18 +90,18 @@ function seed() {
 
     const sampleCats = ['Çorbalar', 'Başlangıçlar', 'Ana Yemekler', 'Izgaralar', 'Tatlılar', 'İçecekler'];
     const sampleItems = [
-      ['Mercimek Çorbası', 'Geleneksel kırmızı mercimek', 85, '/uploads/mercimek_corbasi.png', 1, 1],
-      ['Yayla Çorbası', 'Yoğurtlu, naneli', 90, '/uploads/yayla_corbasi.png', 1, 1],
-      ['Çoban Salata', 'Mevsim sebzeleri', 110, '/uploads/coban_salatasi.png', 1, 2],
-      ['Sigara Böreği', 'Peynirli, 6 adet', 120, '/uploads/sigara_boregi.png', 0, 2],
-      ['Mantı', 'El açması, yoğurtlu', 220, '/uploads/manti.png', 1, 3],
-      ['Kuzu Tandır', 'Odun fırınında 6 saat', 380, '/uploads/kuzu_tandir.png', 1, 3],
-      ['Adana Kebap', 'Acılı, közde', 290, '/uploads/adana_kebap.png', 1, 4],
-      ['Kuzu Pirzola', 'Mangalda, 4 adet', 420, '/uploads/kuzu_pirzola.png', 0, 4],
-      ['Künefe', 'Antep fıstıklı', 150, '/uploads/kunefe.png', 1, 5],
-      ['Sütlaç', 'Fırında', 95, '/uploads/sutlac.png', 1, 5],
-      ['Ayran', 'Ev yapımı, köpüklü', 35, '/uploads/ayran.png', 1, 6],
-      ['Şalgam', 'Acılı / acısız', 40, '/uploads/salgam.png', 1, 6],
+      ['Mercimek Çorbası', 'Geleneksel kırmızı mercimek', 85, '/uploads/mercimek_corbasi.webp', 1, 1],
+      ['Yayla Çorbası', 'Yoğurtlu, naneli', 90, '/uploads/yayla_corbasi.webp', 1, 1],
+      ['Çoban Salata', 'Mevsim sebzeleri', 110, '/uploads/coban_salatasi.webp', 1, 2],
+      ['Sigara Böreği', 'Peynirli, 6 adet', 120, '/uploads/sigara_boregi.webp', 0, 2],
+      ['Mantı', 'El açması, yoğurtlu', 220, '/uploads/manti.webp', 1, 3],
+      ['Kuzu Tandır', 'Odun fırınında 6 saat', 380, '/uploads/kuzu_tandir.webp', 1, 3],
+      ['Adana Kebap', 'Acılı, közde', 290, '/uploads/adana_kebap.webp', 1, 4],
+      ['Kuzu Pirzola', 'Mangalda, 4 adet', 420, '/uploads/kuzu_pirzola.webp', 0, 4],
+      ['Künefe', 'Antep fıstıklı', 150, '/uploads/kunefe.webp', 1, 5],
+      ['Sütlaç', 'Fırında', 95, '/uploads/sutlac.webp', 1, 5],
+      ['Ayran', 'Ev yapımı, köpüklü', 35, '/uploads/ayran.webp', 1, 6],
+      ['Şalgam', 'Acılı / acısız', 40, '/uploads/salgam.webp', 1, 6],
     ];
 
     const tx = db.transaction(() => {
@@ -113,23 +113,30 @@ function seed() {
     tx();
     console.log('[seed] Örnek menü verisi eklendi.');
   } else {
-    // Mevcut veritabanında görsel yolları boşsa, örnek ürünlerin görsel yollarını güncelle
+    // Mevcut veritabanında .png uzantılı görsel yolları varsa, bunları .webp yap (Optimizasyon geçişi)
+    const pngItemsCount = db.prepare("SELECT COUNT(*) AS n FROM items WHERE image_url LIKE '%.png'").get().n;
+    if (pngItemsCount > 0) {
+      db.exec("UPDATE items SET image_url = replace(image_url, '.png', '.webp') WHERE image_url LIKE '%.png'");
+      console.log(`[seed] ${pngItemsCount} ürünün görsel uzantısı .png'den .webp'ye güncellendi.`);
+    }
+
+    // Mevcut veritabanında görsel yolları tamamen boşsa, örnek ürünlerin görsel yollarını güncelle
     const itemsWithoutImages = db.prepare("SELECT COUNT(*) AS n FROM items WHERE image_url = '' OR image_url IS NULL").get().n;
     if (itemsWithoutImages > 0) {
       const updateStmt = db.prepare("UPDATE items SET image_url = ? WHERE name = ? AND (image_url = '' OR image_url IS NULL)");
       const imageMappings = {
-        'Mercimek Çorbası': '/uploads/mercimek_corbasi.png',
-        'Yayla Çorbası': '/uploads/yayla_corbasi.png',
-        'Çoban Salata': '/uploads/coban_salatasi.png',
-        'Sigara Böreği': '/uploads/sigara_boregi.png',
-        'Mantı': '/uploads/manti.png',
-        'Kuzu Tandır': '/uploads/kuzu_tandir.png',
-        'Adana Kebap': '/uploads/adana_kebap.png',
-        'Kuzu Pirzola': '/uploads/kuzu_pirzola.png',
-        'Künefe': '/uploads/kunefe.png',
-        'Sütlaç': '/uploads/sutlac.png',
-        'Ayran': '/uploads/ayran.png',
-        'Şalgam': '/uploads/salgam.png'
+        'Mercimek Çorbası': '/uploads/mercimek_corbasi.webp',
+        'Yayla Çorbası': '/uploads/yayla_corbasi.webp',
+        'Çoban Salata': '/uploads/coban_salatasi.webp',
+        'Sigara Böreği': '/uploads/sigara_boregi.webp',
+        'Mantı': '/uploads/manti.webp',
+        'Kuzu Tandır': '/uploads/kuzu_tandir.webp',
+        'Adana Kebap': '/uploads/adana_kebap.webp',
+        'Kuzu Pirzola': '/uploads/kuzu_pirzola.webp',
+        'Künefe': '/uploads/kunefe.webp',
+        'Sütlaç': '/uploads/sutlac.webp',
+        'Ayran': '/uploads/ayran.webp',
+        'Şalgam': '/uploads/salgam.webp'
       };
       const tx = db.transaction(() => {
         for (const [name, img] of Object.entries(imageMappings)) {
