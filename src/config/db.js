@@ -84,34 +84,61 @@ function seed() {
   if (catCount === 0) {
     const insertCat = db.prepare('INSERT INTO categories (name, sort_order) VALUES (?, ?)');
     const insertItem = db.prepare(
-      `INSERT INTO items (category_id, name, description, price, is_available, sort_order)
-       VALUES (?, ?, ?, ?, ?, ?)`
+      `INSERT INTO items (category_id, name, description, price, image_url, is_available, sort_order)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`
     );
 
     const sampleCats = ['Çorbalar', 'Başlangıçlar', 'Ana Yemekler', 'Izgaralar', 'Tatlılar', 'İçecekler'];
     const sampleItems = [
-      ['Mercimek Çorbası', 'Geleneksel kırmızı mercimek', 85, 1, 1],
-      ['Yayla Çorbası', 'Yoğurtlu, naneli', 90, 1, 1],
-      ['Çoban Salata', 'Mevsim sebzeleri', 110, 1, 2],
-      ['Sigara Böreği', 'Peynirli, 6 adet', 120, 0, 2],
-      ['Mantı', 'El açması, yoğurtlu', 220, 1, 3],
-      ['Kuzu Tandır', 'Odun fırınında 6 saat', 380, 1, 3],
-      ['Adana Kebap', 'Acılı, közde', 290, 1, 4],
-      ['Kuzu Pirzola', 'Mangalda, 4 adet', 420, 0, 4],
-      ['Künefe', 'Antep fıstıklı', 150, 1, 5],
-      ['Sütlaç', 'Fırında', 95, 1, 5],
-      ['Ayran', 'Ev yapımı, köpüklü', 35, 1, 6],
-      ['Şalgam', 'Acılı / acısız', 40, 1, 6],
+      ['Mercimek Çorbası', 'Geleneksel kırmızı mercimek', 85, '/uploads/mercimek_corbasi.png', 1, 1],
+      ['Yayla Çorbası', 'Yoğurtlu, naneli', 90, '/uploads/yayla_corbasi.png', 1, 1],
+      ['Çoban Salata', 'Mevsim sebzeleri', 110, '/uploads/coban_salatasi.png', 1, 2],
+      ['Sigara Böreği', 'Peynirli, 6 adet', 120, '/uploads/sigara_boregi.png', 0, 2],
+      ['Mantı', 'El açması, yoğurtlu', 220, '/uploads/manti.png', 1, 3],
+      ['Kuzu Tandır', 'Odun fırınında 6 saat', 380, '/uploads/kuzu_tandir.png', 1, 3],
+      ['Adana Kebap', 'Acılı, közde', 290, '/uploads/adana_kebap.png', 1, 4],
+      ['Kuzu Pirzola', 'Mangalda, 4 adet', 420, '/uploads/kuzu_pirzola.png', 0, 4],
+      ['Künefe', 'Antep fıstıklı', 150, '/uploads/kunefe.png', 1, 5],
+      ['Sütlaç', 'Fırında', 95, '/uploads/sutlac.png', 1, 5],
+      ['Ayran', 'Ev yapımı, köpüklü', 35, '/uploads/ayran.png', 1, 6],
+      ['Şalgam', 'Acılı / acısız', 40, '/uploads/salgam.png', 1, 6],
     ];
 
     const tx = db.transaction(() => {
       const catIds = sampleCats.map((name, i) => Number(insertCat.run(name, i).lastInsertRowid));
-      sampleItems.forEach(([name, desc, price, avail, catIndex], i) => {
-        insertItem.run(catIds[catIndex - 1], name, desc, price, avail, i);
+      sampleItems.forEach(([name, desc, price, img, avail, catIndex], i) => {
+        insertItem.run(catIds[catIndex - 1], name, desc, price, img, avail, i);
       });
     });
     tx();
     console.log('[seed] Örnek menü verisi eklendi.');
+  } else {
+    // Mevcut veritabanında görsel yolları boşsa, örnek ürünlerin görsel yollarını güncelle
+    const itemsWithoutImages = db.prepare("SELECT COUNT(*) AS n FROM items WHERE image_url = '' OR image_url IS NULL").get().n;
+    if (itemsWithoutImages > 0) {
+      const updateStmt = db.prepare("UPDATE items SET image_url = ? WHERE name = ? AND (image_url = '' OR image_url IS NULL)");
+      const imageMappings = {
+        'Mercimek Çorbası': '/uploads/mercimek_corbasi.png',
+        'Yayla Çorbası': '/uploads/yayla_corbasi.png',
+        'Çoban Salata': '/uploads/coban_salatasi.png',
+        'Sigara Böreği': '/uploads/sigara_boregi.png',
+        'Mantı': '/uploads/manti.png',
+        'Kuzu Tandır': '/uploads/kuzu_tandir.png',
+        'Adana Kebap': '/uploads/adana_kebap.png',
+        'Kuzu Pirzola': '/uploads/kuzu_pirzola.png',
+        'Künefe': '/uploads/kunefe.png',
+        'Sütlaç': '/uploads/sutlac.png',
+        'Ayran': '/uploads/ayran.png',
+        'Şalgam': '/uploads/salgam.png'
+      };
+      const tx = db.transaction(() => {
+        for (const [name, img] of Object.entries(imageMappings)) {
+          updateStmt.run(img, name);
+        }
+      });
+      tx();
+      console.log('[seed] Mevcut örnek ürünlerin görsel yolları güncellendi.');
+    }
   }
 }
 
