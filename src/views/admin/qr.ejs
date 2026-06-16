@@ -1,0 +1,55 @@
+<%- include('../partials/head', { title: pageTitle }) %>
+<%- include('../partials/admin-top') %>
+
+<style>
+  /* Yazdırırken yalnızca kart görünsün */
+  @media print {
+    body * { visibility: hidden !important; }
+    #qrCard, #qrCard * { visibility: visible !important; }
+    #qrCard { position: fixed; inset: 0; margin: auto; border: none !important; box-shadow: none !important; }
+  }
+  #qrCard svg { width: 100%; height: auto; display: block; }
+</style>
+
+<div class="animate-pop cat-split" style="max-width:900px">
+
+  <!-- Yazdırılabilir kart -->
+  <div id="qrCard" style="background:#ffffff;color:#15181d;border:1px solid var(--border);border-radius:18px;box-shadow:var(--shadow);padding:28px 26px;text-align:center">
+    <div style="font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#2563eb"><%= brand %></div>
+    <div style="font-size:12px;color:#697586;margin-top:2px"><%= t.qr_card_brandless %></div>
+    <div style="width:260px;max-width:100%;margin:18px auto 14px"><%- svg %></div>
+    <div style="font-size:16px;font-weight:700;color:#15181d"><%= t.qr_card_scan %></div>
+    <div style="font-size:11.5px;color:#98a2b3;margin-top:8px;word-break:break-all;font-family:'IBM Plex Mono',monospace"><%= url %></div>
+  </div>
+
+  <!-- Kontroller -->
+  <div style="display:flex;flex-direction:column;gap:16px">
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:15px;box-shadow:var(--shadow-sm);padding:18px">
+      <form method="GET" action="/admin/qr">
+        <label style="display:block;font-size:12.5px;font-weight:600;color:var(--muted);margin-bottom:6px"><%= t.qr_menu_url %></label>
+        <div style="display:flex;gap:8px">
+          <input name="url" value="<%= url %>" placeholder="https://…" class="mono" style="flex:1;min-width:0;height:42px;padding:0 13px;border:1px solid var(--border-strong);border-radius:10px;background:var(--surface-2);color:var(--text);font-size:13px">
+          <button type="submit" class="hov-surface" style="flex:none;height:42px;padding:0 14px;border:1px solid var(--border-strong);border-radius:10px;background:var(--surface);color:var(--text);font-size:13.5px;font-weight:600;font-family:inherit;cursor:pointer"><%= t.qr_update %></button>
+        </div>
+        <p style="margin:10px 0 0;font-size:11.5px;color:var(--muted-2);line-height:1.5"><%= t.qr_hint %></p>
+      </form>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <button type="button" id="qrPrint" class="hov-accent" style="height:46px;border:none;border-radius:11px;background:var(--accent);color:var(--on-accent);font-size:14.5px;font-weight:700;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:var(--shadow)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-2M6 14h12v7H6z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <%= t.qr_print %>
+      </button>
+      <div style="display:flex;gap:10px">
+        <a href="/admin/qr/download?format=png&url=<%= encodeURIComponent(url) %>" class="hov-surface" style="flex:1;height:44px;border:1px solid var(--border-strong);border-radius:11px;background:var(--surface);color:var(--text);font-size:13.5px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:7px">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><%= t.qr_download_png %>
+        </a>
+        <a href="/admin/qr/download?format=svg&url=<%= encodeURIComponent(url) %>" class="hov-surface" style="flex:1;height:44px;border:1px solid var(--border-strong);border-radius:11px;background:var(--surface);color:var(--text);font-size:13.5px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:7px">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><%= t.qr_download_svg %>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/admin-bottom') %>

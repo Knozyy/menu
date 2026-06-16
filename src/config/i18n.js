@@ -44,6 +44,12 @@ const STRINGS = {
     cat_name_en_label: 'İngilizce kategori adı',
     en_optional: 'Opsiyonel — boşsa menüde Türkçesi gösterilir.',
     product_name_en_ph: 'e.g. Mixed Grill', category_en_ph: 'e.g. Breakfast',
+    // QR
+    nav_qr: 'QR Kod', qr_sub: 'Menü karekodu',
+    qr_menu_url: 'Menü adresi', qr_update: 'Güncelle',
+    qr_hint: 'Müşteriler bu karekodu okutunca menüye ulaşır. İndirip masa kartı/poster olarak yazdırın.',
+    qr_download_png: 'PNG indir', qr_download_svg: 'SVG indir', qr_print: 'Yazdır',
+    qr_card_scan: 'Menümüz için okutun', qr_card_brandless: 'Dijital Menü',
     // misc
     menu_sections: 'Menü bölümleri', all_menu_items: 'Tüm menü ürünleri',
   },
@@ -79,6 +85,11 @@ const STRINGS = {
     cat_name_en_label: 'English category name',
     en_optional: 'Optional — Turkish is shown on the menu if left empty.',
     product_name_en_ph: 'e.g. Mixed Grill', category_en_ph: 'e.g. Breakfast',
+    nav_qr: 'QR Code', qr_sub: 'Menu QR code',
+    qr_menu_url: 'Menu URL', qr_update: 'Update',
+    qr_hint: 'Customers reach the menu by scanning this QR code. Download it and print as a table card or poster.',
+    qr_download_png: 'Download PNG', qr_download_svg: 'Download SVG', qr_print: 'Print',
+    qr_card_scan: 'Scan to view our menu', qr_card_brandless: 'Digital Menu',
     menu_sections: 'Menu sections', all_menu_items: 'All menu items',
   },
 };

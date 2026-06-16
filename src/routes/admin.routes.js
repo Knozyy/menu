@@ -9,6 +9,7 @@ const upload = require('../middleware/upload');
 const dashboardController = require('../controllers/dashboardController');
 const categoryController = require('../controllers/categoryController');
 const itemController = require('../controllers/itemController');
+const qrController = require('../controllers/qrController');
 
 module.exports = (csrf) => {
   // Bu router'a bağlanan TÜM rotalar oturum ister
@@ -16,6 +17,10 @@ module.exports = (csrf) => {
 
   // Dashboard
   router.get('/', dashboardController.index);
+
+  // QR kod
+  router.get('/qr', qrController.index);
+  router.get('/qr/download', qrController.download);
 
   // Kategoriler (multipart yok → CSRF doğrudan)
   router.get('/categories', categoryController.list);

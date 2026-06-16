@@ -152,4 +152,8 @@
         : availDesc.getAttribute('data-off');
     });
   }
+
+  // ---------- QR sayfası: yazdır ----------
+  var qrPrint = document.getElementById('qrPrint');
+  if (qrPrint) qrPrint.addEventListener('click', function () { window.print(); });
 })();
