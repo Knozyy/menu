@@ -19,6 +19,7 @@ require('./config/db'); // şema + seed (import edilince çalışır)
 const i18n = require('./config/i18n');
 
 const app = express();
+app.set('trust proxy', 1); // Ters proxy (Nginx, Caddy vb.) arkasında SSL/secure çerezleri için şart.
 const PORT = process.env.PORT || 3000;
 const isProd = process.env.NODE_ENV === 'production';
 
@@ -72,7 +73,9 @@ app.use(
     cookie: {
       httpOnly: true,
       sameSite: 'lax',
-      secure: isProd,
+      // HTTPS (ters proxy ile SSL) arkasında çalışılıyorsa .env'de COOKIE_SECURE=true yapın.
+      // Düz HTTP sunucuda false olmalı — aksi halde oturum çerezleri gönderilmez ve CSRF bozulur.
+      secure: process.env.COOKIE_SECURE === 'true',
       maxAge: 1000 * 60 * 60 * 8, // 8 saat
     },
   })

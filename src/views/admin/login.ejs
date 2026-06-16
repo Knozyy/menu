@@ -30,25 +30,25 @@
       <input name="password" type="password" autocomplete="current-password" placeholder="••••••••" style="width:100%;height:44px;padding:0 14px;border:1px solid var(--border-strong);border-radius:11px;background:var(--surface-2);color:var(--text);font-size:14.5px;font-family:inherit;margin-bottom:18px">
 
       <button type="submit" class="hov-accent" style="width:100%;height:46px;border:none;border-radius:11px;background:var(--accent);color:var(--on-accent);font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;box-shadow:var(--shadow);transition:background .15s"><%= t.login_btn %></button>
-
-      <div style="margin-top:16px;padding-top:14px;border-top:1px dashed var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px">
-        <span style="font-size:12px;color:var(--muted-2)" class="mono"><%= t.demo_hint %></span>
-        <div style="display:flex;gap:6px">
-          <form method="POST" action="/prefs/lang"><input type="hidden" name="_csrf" value="<%= csrfToken %>">
-            <button type="submit" title="Language" style="height:30px;padding:0 11px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);font-size:12px;font-weight:700;font-family:inherit;cursor:pointer"><%= langLabel %></button>
-          </form>
-          <form method="POST" action="/prefs/theme"><input type="hidden" name="_csrf" value="<%= csrfToken %>">
-            <button type="submit" title="Theme" style="width:30px;height:30px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center">
-              <% if (theme === 'dark') { %>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4.5" stroke="currentColor" stroke-width="2"/><path d="M12 2v2M12 20v2M4 12H2M22 12h-2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-              <% } else { %>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
-              <% } %>
-            </button>
-          </form>
-        </div>
-      </div>
     </form>
+
+    <div style="margin-top:16px;padding:0 10px;display:flex;align-items:center;justify-content:space-between;gap:12px">
+      <span style="font-size:12px;color:var(--muted-2)" class="mono"><%= t.demo_hint %></span>
+      <div style="display:flex;gap:6px">
+        <form method="POST" action="/prefs/lang"><input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <button type="submit" title="Language" style="height:30px;padding:0 11px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);font-size:12px;font-weight:700;font-family:inherit;cursor:pointer"><%= langLabel %></button>
+        </form>
+        <form method="POST" action="/prefs/theme"><input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <button type="submit" title="Theme" style="width:30px;height:30px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center">
+            <% if (theme === 'dark') { %>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4.5" stroke="currentColor" stroke-width="2"/><path d="M12 2v2M12 20v2M4 12H2M22 12h-2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            <% } else { %>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+            <% } %>
+          </button>
+        </form>
+      </div>
+    </div>
   </div>
 </div>
 </body>
