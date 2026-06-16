@@ -1,18 +1,9 @@
-# Yapılacak İşler (TODO) - Görsel Ekleme (Tamamlandı)
+# Yapılacak İşler (TODO) - Görsel Optimizasyonu (Tamamlandı)
 
-- [x] Yemek görsellerini `generate_image` kullanarak üret ve `public/uploads/` dizinine taşı.
-  - [x] Mercimek Çorbası (`mercimek_corbasi.png`)
-  - [x] Yayla Çorbası (`yayla_corbasi.png`)
-  - [x] Çoban Salata (`coban_salatasi.png`)
-  - [x] Sigara Böreği (`sigara_boregi.png`)
-  - [x] Mantı (`manti.png`)
-  - [x] Kuzu Tandır (`kuzu_tandir.png`)
-  - [x] Adana Kebap (`adana_kebap.png`)
-  - [x] Kuzu Pirzola (`kuzu_pirzola.png`)
-  - [x] Künefe (`kunefe.png`)
-  - [x] Sütlaç (`sutlac.png`)
-  - [x] Ayran (`ayran.png`)
-  - [x] Şalgam (`salgam.png`)
-- [x] SQLite veritabanındaki `items` tablosunu güncellemek için bir seed scripti hazırla ve çalıştır.
-- [x] Uygulamayı çalıştırıp görsellerin doğruluğunu kontrol et.
-- [x] Git commit & push.
+- [x] Python betiği `compress_images.py` oluştur ve çalıştır:
+  - [x] PNG görsellerini 400x400 WebP formatına dönüştür.
+  - [x] Eski PNG dosyalarını sil.
+- [x] `src/config/db.js` içindeki seeder görsel yollarını `.png`'den `.webp`'ye çevir.
+- [x] Mevcut SQLite veritabanındaki ürün görsel uzantılarını güncelle.
+- [x] Eski `.png` dosyalarını `git rm` ile kaldır, yeni `.webp` dosyalarını `git add -f` ile ekle.
+- [x] Değişiklikleri test et ve `git push` yap.
