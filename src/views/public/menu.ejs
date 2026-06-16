@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="/css/menu.css">
 </head>
 <body>
+<% function L(tr, en){ return (lang === 'en' && en) ? en : tr; } %>
 <div class="menu-shell" id="top">
 
   <!-- Sticky başlık + kategori çipleri + arama -->
@@ -26,7 +27,7 @@
     <% if (categories.length) { %>
       <nav class="chips" id="catNav">
         <% categories.forEach(function(c, i){ %>
-          <a href="#cat-<%= c.id %>" class="chip<%= i === 0 ? ' active' : '' %>" data-target="cat-<%= c.id %>"><%= c.name %></a>
+          <a href="#cat-<%= c.id %>" class="chip<%= i === 0 ? ' active' : '' %>" data-target="cat-<%= c.id %>"><%= L(c.name, c.name_en) %></a>
         <% }); %>
       </nav>
     <% } %>
@@ -42,10 +43,10 @@
 
     <% categories.forEach(function(c){ %>
       <section class="cat-section" id="cat-<%= c.id %>" data-cat>
-        <h2 class="cat-title"><%= c.name %></h2>
+        <h2 class="cat-title"><%= L(c.name, c.name_en) %></h2>
         <div class="dish-list">
           <% c.items.forEach(function(p){ %>
-            <article class="dish" data-dish data-name="<%= (p.name + ' ' + (p.description || '')).toLowerCase() %>">
+            <article class="dish" data-dish data-name="<%= (p.name + ' ' + (p.name_en || '') + ' ' + (p.description || '') + ' ' + (p.description_en || '')).toLowerCase() %>">
               <% if (p.image_url) { %>
                 <div class="dish-photo" style="background-image:url('<%= encodeURI(p.image_url) %>')"></div>
               <% } else { %>
@@ -55,10 +56,10 @@
               <% } %>
               <div class="dish-body">
                 <div class="dish-head">
-                  <h3 class="dish-name"><%= p.name %></h3>
+                  <h3 class="dish-name"><%= L(p.name, p.name_en) %></h3>
                   <span class="dish-price"><%= fmt(p.price) %></span>
                 </div>
-                <% if (p.description) { %><p class="dish-desc"><%= p.description %></p><% } %>
+                <% var dd = L(p.description, p.description_en); if (dd) { %><p class="dish-desc"><%= dd %></p><% } %>
               </div>
             </article>
           <% }); %>
@@ -111,7 +112,7 @@
     <div class="sheet-list">
       <% categories.forEach(function(c){ %>
         <button type="button" class="sheet-item" data-target="cat-<%= c.id %>">
-          <span><%= c.name %></span>
+          <span><%= L(c.name, c.name_en) %></span>
           <span class="count"><%= c.items.length %></span>
         </button>
       <% }); %>

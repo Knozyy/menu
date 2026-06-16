@@ -23,9 +23,10 @@
           <span style="width:26px;height:26px;flex:none;border-radius:7px;background:var(--surface-3);color:var(--muted);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700" class="mono"><%= i + 1 %></span>
 
           <% if (editId === c.id) { %>
-            <form method="POST" action="/admin/categories/<%= c.id %>/edit" style="flex:1;display:flex;gap:6px;align-items:center">
+            <form method="POST" action="/admin/categories/<%= c.id %>/edit" style="flex:1;display:flex;gap:6px;align-items:center;flex-wrap:wrap">
               <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-              <input name="name" value="<%= c.name %>" autofocus style="flex:1;height:36px;padding:0 11px;border:1px solid var(--accent);border-radius:9px;background:var(--surface-2);color:var(--text);font-size:14px;font-family:inherit">
+              <input name="name" value="<%= c.name %>" autofocus placeholder="<%= t.category_name %>" style="flex:1;min-width:120px;height:36px;padding:0 11px;border:1px solid var(--accent);border-radius:9px;background:var(--surface-2);color:var(--text);font-size:14px;font-family:inherit">
+              <input name="name_en" value="<%= c.name_en || '' %>" placeholder="<%= t.cat_name_en_label %> (EN)" style="flex:1;min-width:110px;height:36px;padding:0 11px;border:1px solid var(--border-strong);border-radius:9px;background:var(--surface-2);color:var(--text);font-size:14px;font-family:inherit">
               <button type="submit" class="hov-accent" style="height:36px;padding:0 13px;border:none;border-radius:9px;background:var(--accent);color:var(--on-accent);font-size:13px;font-weight:700;font-family:inherit;cursor:pointer"><%= t.save %></button>
               <a href="/admin/categories" style="height:36px;width:36px;border:1px solid var(--border);border-radius:9px;background:var(--surface);color:var(--muted);display:flex;align-items:center;justify-content:center">×</a>
             </form>
@@ -51,7 +52,10 @@
     <h3 style="margin:0 0 4px;font-size:15px;font-weight:700"><%= t.new_category %></h3>
     <p style="margin:0 0 14px;font-size:12.5px;color:var(--muted)"><%= t.new_category_sub %></p>
     <label style="display:block;font-size:12.5px;font-weight:600;color:var(--muted);margin-bottom:6px"><%= t.category_name %></label>
-    <input name="name" required placeholder="<%= t.category_ph %>" style="width:100%;height:42px;padding:0 13px;border:1px solid var(--border-strong);border-radius:10px;background:var(--surface-2);color:var(--text);font-size:14px;font-family:inherit;margin-bottom:14px">
+    <input name="name" required placeholder="<%= t.category_ph %>" style="width:100%;height:42px;padding:0 13px;border:1px solid var(--border-strong);border-radius:10px;background:var(--surface-2);color:var(--text);font-size:14px;font-family:inherit;margin-bottom:12px">
+    <label style="display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:var(--muted);margin-bottom:6px"><%= t.cat_name_en_label %> <span style="font-size:10px;font-weight:700;color:var(--accent);background:var(--accent-soft);padding:1px 7px;border-radius:20px">EN</span></label>
+    <input name="name_en" placeholder="<%= t.category_en_ph %>" style="width:100%;height:42px;padding:0 13px;border:1px solid var(--border-strong);border-radius:10px;background:var(--surface-2);color:var(--text);font-size:14px;font-family:inherit;margin-bottom:6px">
+    <p style="margin:0 0 14px;font-size:11.5px;color:var(--muted-2)"><%= t.en_optional %></p>
     <button type="submit" class="hov-accent" style="width:100%;height:44px;border:none;border-radius:10px;background:var(--accent);color:var(--on-accent);font-size:14.5px;font-weight:700;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg><%= t.add_category %></button>
   </form>
 </div>

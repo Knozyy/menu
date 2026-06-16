@@ -88,13 +88,15 @@ module.exports = {
     const max = db.prepare('SELECT COALESCE(MAX(sort_order), -1) AS m FROM items').get().m;
     const info = db
       .prepare(
-        `INSERT INTO items (category_id, name, description, price, image_url, is_available, sort_order)
-         VALUES (?, ?, ?, ?, ?, ?, ?)`
+        `INSERT INTO items (category_id, name, name_en, description, description_en, price, image_url, is_available, sort_order)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
       )
       .run(
         data.category_id,
         data.name,
+        data.name_en || '',
         data.description,
+        data.description_en || '',
         data.price,
         data.image_url,
         data.is_available,
@@ -107,13 +109,16 @@ module.exports = {
     return db
       .prepare(
         `UPDATE items SET
-           category_id = ?, name = ?, description = ?, price = ?, image_url = ?, is_available = ?
+           category_id = ?, name = ?, name_en = ?, description = ?, description_en = ?,
+           price = ?, image_url = ?, is_available = ?
          WHERE id = ?`
       )
       .run(
         data.category_id,
         data.name,
+        data.name_en || '',
         data.description,
+        data.description_en || '',
         data.price,
         data.image_url,
         data.is_available,

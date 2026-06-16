@@ -38,6 +38,13 @@ db.transaction = (fn) => (...args) => {
   }
 };
 
+function hasColumn(table, col) {
+  return db.prepare(`PRAGMA table_info(${table})`).all().some((c) => c.name === col);
+}
+function addColumn(table, col, ddl) {
+  if (!hasColumn(table, col)) db.exec(`ALTER TABLE ${table} ADD COLUMN ${ddl}`);
+}
+
 function migrate() {
   db.exec(`
     CREATE TABLE IF NOT EXISTS users (
@@ -68,6 +75,41 @@ function migrate() {
 
     CREATE INDEX IF NOT EXISTS idx_items_category ON items(category_id);
   `);
+
+  // Çok dilli (İngilizce) alanlar — mevcut DB'ye güvenli/idempotent ekleme
+  addColumn('categories', 'name_en', "name_en TEXT NOT NULL DEFAULT ''");
+  addColumn('items', 'name_en', "name_en TEXT NOT NULL DEFAULT ''");
+  addColumn('items', 'description_en', "description_en TEXT NOT NULL DEFAULT ''");
+}
+
+/**
+ * Örnek (seed) verinin İngilizce karşılıklarını doldurur.
+ * Yalnızca name_en'i boş olan ve bilinen Türkçe adla eşleşen satırları günceller;
+ * kullanıcının elle girdiği çevirileri ASLA ezmez. Her açılışta güvenle çalışır.
+ */
+function backfillEnglish() {
+  const cats = {
+    'Çorbalar': 'Soups', 'Başlangıçlar': 'Starters', 'Ana Yemekler': 'Main Courses',
+    'Izgaralar': 'Grills', 'Tatlılar': 'Desserts', 'İçecekler': 'Beverages',
+  };
+  const items = {
+    'Mercimek Çorbası': ['Red Lentil Soup', 'Traditional red lentils'],
+    'Yayla Çorbası': ['Yayla Soup', 'With yogurt and mint'],
+    'Çoban Salata': ["Shepherd's Salad", 'Seasonal vegetables'],
+    'Sigara Böreği': ['Cheese Rolls', 'With cheese, 6 pieces'],
+    'Mantı': ['Mantı (Turkish Dumplings)', 'Handmade, with yogurt'],
+    'Kuzu Tandır': ['Slow-Roasted Lamb', '6 hours in a wood oven'],
+    'Adana Kebap': ['Adana Kebab', 'Spicy, char-grilled'],
+    'Kuzu Pirzola': ['Lamb Chops', 'Grilled, 4 pieces'],
+    'Künefe': ['Künefe', 'With pistachio'],
+    'Sütlaç': ['Rice Pudding', 'Oven-baked'],
+    'Ayran': ['Ayran', 'Homemade, frothy'],
+    'Şalgam': ['Şalgam (Turnip Juice)', 'Hot / mild'],
+  };
+  const upCat = db.prepare("UPDATE categories SET name_en = ? WHERE name = ? AND (name_en IS NULL OR name_en = '')");
+  for (const [tr, en] of Object.entries(cats)) upCat.run(en, tr);
+  const upItem = db.prepare("UPDATE items SET name_en = ?, description_en = ? WHERE name = ? AND (name_en IS NULL OR name_en = '')");
+  for (const [tr, [en, den]] of Object.entries(items)) upItem.run(en, den, tr);
 }
 
 function seed() {
@@ -151,5 +193,6 @@ function seed() {
 
 migrate();
 seed();
+backfillEnglish();
 
 module.exports = db;

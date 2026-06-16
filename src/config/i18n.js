@@ -39,6 +39,11 @@ const STRINGS = {
     save_product: 'Kaydet', edit_product: 'Ürünü Düzenle', new_product: 'Yeni Ürün',
     avail_on: 'Müşteriler bu ürünü görebilir.', avail_off: 'Ürün menüde gizlenir.',
     st_available: 'Stokta', st_out: 'Tükendi',
+    // çok dilli alanlar (admin)
+    name_en_label: 'İngilizce ad', desc_en_label: 'İngilizce açıklama',
+    cat_name_en_label: 'İngilizce kategori adı',
+    en_optional: 'Opsiyonel — boşsa menüde Türkçesi gösterilir.',
+    product_name_en_ph: 'e.g. Mixed Grill', category_en_ph: 'e.g. Breakfast',
     // misc
     menu_sections: 'Menü bölümleri', all_menu_items: 'Tüm menü ürünleri',
   },
@@ -70,6 +75,10 @@ const STRINGS = {
     save_product: 'Save', edit_product: 'Edit Product', new_product: 'New Product',
     avail_on: 'Customers can see this item.', avail_off: 'Item is hidden from the menu.',
     st_available: 'In stock', st_out: 'Sold out',
+    name_en_label: 'English name', desc_en_label: 'English description',
+    cat_name_en_label: 'English category name',
+    en_optional: 'Optional — Turkish is shown on the menu if left empty.',
+    product_name_en_ph: 'e.g. Mixed Grill', category_en_ph: 'e.g. Breakfast',
     menu_sections: 'Menu sections', all_menu_items: 'All menu items',
   },
 };

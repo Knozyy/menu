@@ -23,15 +23,15 @@ module.exports = {
       .all();
   },
 
-  create(name) {
+  create(name, name_en = '') {
     const max = db.prepare('SELECT COALESCE(MAX(sort_order), -1) AS m FROM categories').get().m;
     return db
-      .prepare('INSERT INTO categories (name, sort_order) VALUES (?, ?)')
-      .run(name, max + 1).lastInsertRowid;
+      .prepare('INSERT INTO categories (name, name_en, sort_order) VALUES (?, ?, ?)')
+      .run(name, name_en, max + 1).lastInsertRowid;
   },
 
-  rename(id, name) {
-    return db.prepare('UPDATE categories SET name = ? WHERE id = ?').run(name, id);
+  rename(id, name, name_en = '') {
+    return db.prepare('UPDATE categories SET name = ?, name_en = ? WHERE id = ?').run(name, name_en, id);
   },
 
   countItems(id) {

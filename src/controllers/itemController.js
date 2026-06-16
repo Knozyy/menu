@@ -7,7 +7,9 @@ const categoryModel = require('../models/categoryModel');
 function parseItemBody(req) {
   const body = req.body || {};
   const name = (body.name || '').trim();
+  const name_en = (body.name_en || '').trim();
   const description = (body.description || '').trim();
+  const description_en = (body.description_en || '').trim();
   const price = parseFloat(body.price);
   const category_id = Number(body.category_id);
   const is_available = body.is_available === '1' ? 1 : 0;
@@ -18,7 +20,7 @@ function parseItemBody(req) {
     image_url = '/uploads/' + req.file.filename;
   }
 
-  return { name, description, price, category_id, is_available, image_url };
+  return { name, name_en, description, description_en, price, category_id, is_available, image_url };
 }
 
 function validate(data, lang) {
@@ -51,7 +53,7 @@ module.exports = {
   newForm(req, res) {
     const categories = categoryModel.all();
     res.render('admin/product-form', {
-      item: { id: null, category_id: categories[0] ? categories[0].id : null, name: '', description: '', price: '', image_url: '', is_available: 1 },
+      item: { id: null, category_id: categories[0] ? categories[0].id : null, name: '', name_en: '', description: '', description_en: '', price: '', image_url: '', is_available: 1 },
       categories,
       error: null,
       formAction: '/admin/products',

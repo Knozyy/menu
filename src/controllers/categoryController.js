@@ -17,13 +17,15 @@ module.exports = {
 
   create(req, res) {
     const name = (req.body.name || '').trim();
-    if (name) categoryModel.create(name);
+    const nameEn = (req.body.name_en || '').trim();
+    if (name) categoryModel.create(name, nameEn);
     res.redirect('/admin/categories');
   },
 
   rename(req, res) {
     const name = (req.body.name || '').trim();
-    if (name) categoryModel.rename(Number(req.params.id), name);
+    const nameEn = (req.body.name_en || '').trim();
+    if (name) categoryModel.rename(Number(req.params.id), name, nameEn);
     res.redirect('/admin/categories');
   },
 

@@ -67,8 +67,17 @@
           <input name="name" value="<%= item.name %>" required placeholder="<%= t.product_name_ph %>" style="width:100%;height:44px;padding:0 13px;border:1px solid var(--border-strong);border-radius:10px;background:var(--surface-2);color:var(--text);font-size:14px;font-family:inherit">
         </div>
         <div>
+          <label style="display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:var(--muted);margin-bottom:6px"><%= t.name_en_label %> <span style="font-size:10px;font-weight:700;color:var(--accent);background:var(--accent-soft);padding:1px 7px;border-radius:20px">EN</span></label>
+          <input name="name_en" value="<%= item.name_en || '' %>" placeholder="<%= t.product_name_en_ph %>" style="width:100%;height:44px;padding:0 13px;border:1px solid var(--border-strong);border-radius:10px;background:var(--surface-2);color:var(--text);font-size:14px;font-family:inherit">
+        </div>
+        <div>
           <label style="display:block;font-size:12.5px;font-weight:600;color:var(--muted);margin-bottom:6px"><%= t.description %></label>
           <textarea name="description" rows="3" placeholder="<%= t.description_ph %>" style="width:100%;padding:11px 13px;border:1px solid var(--border-strong);border-radius:10px;background:var(--surface-2);color:var(--text);font-size:14px;font-family:inherit;resize:vertical;line-height:1.5"><%= item.description %></textarea>
+        </div>
+        <div>
+          <label style="display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:var(--muted);margin-bottom:6px"><%= t.desc_en_label %> <span style="font-size:10px;font-weight:700;color:var(--accent);background:var(--accent-soft);padding:1px 7px;border-radius:20px">EN</span></label>
+          <textarea name="description_en" rows="3" placeholder="<%= t.description_ph %>" style="width:100%;padding:11px 13px;border:1px solid var(--border-strong);border-radius:10px;background:var(--surface-2);color:var(--text);font-size:14px;font-family:inherit;resize:vertical;line-height:1.5"><%= item.description_en || '' %></textarea>
+          <p style="margin:6px 0 0;font-size:11.5px;color:var(--muted-2)"><%= t.en_optional %></p>
         </div>
         <div>
           <label style="display:block;font-size:12.5px;font-weight:600;color:var(--muted);margin-bottom:6px"><%= t.price %></label>
